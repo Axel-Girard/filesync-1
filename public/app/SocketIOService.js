@@ -11,8 +11,6 @@ angular.module('FileSync')
       socket.emit('viewer:new', login);
     });
 
-
-
     socket.on('file:changed', function(filename, timestamp, content) {
       $timeout(function() {
         _onFileChanged(filename, timestamp, content);
@@ -46,5 +44,8 @@ angular.module('FileSync')
       userChangedState: function(state) {
         socket.emit('user-visibility:changed', state);
       }
+      /*updateMessage: function(message) {
+        socket.emit('messageSend', state);
+      }*/
     };
   }]);

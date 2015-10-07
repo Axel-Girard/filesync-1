@@ -64,6 +64,12 @@ sio.on('connection', function(socket) {
     console.log('new viewer with nickname %s', nickname, viewers);
   });
 
+  socket.on('message:new', function(messages) {
+    socket.messages = messages;
+    messages.add(messages);
+    console.log('new messages %s', message, messages);
+  });
+
   socket.on('disconnect', function() {
     viewers.remove(socket.nickname);
     console.log('viewer disconnected %s\nremaining:', socket.nickname, viewers);
@@ -86,8 +92,16 @@ sio.on('connection', function(socket) {
     socket.visibility = state;
     sio.emit('users:visibility-states', getVisibilityCounts());
   });
+
+  socket.on('messageSend', function(message) {
+    sio.emit('messageSend', getVisibilityCounts());
+  });
 });
 
 function getVisibilityCounts() {
+  return _.chain(sio.sockets.sockets).values().countBy('visibility').value();
+}
+
+function getMessage() {
   return _.chain(sio.sockets.sockets).values().countBy('visibility').value();
 }
