@@ -11,15 +11,19 @@
   </head>
 
   <body>
-
-
     <div class="container" ng-controller="SocialCtrl as social">
-      <div ng-repeat="viewer in social.viewers" class="animate">
+      <h3>
+        Viewers :
+      </h3>
+      <div ng-repeat="viewer in social.viewers track by $index" class="animate">
         {{ viewer }}
       </div>
 
+      <h3>
+        Messages :
+      </h3>
       <div class="wrap" style="overflow:auto;max-height:100px;">
-        <div ng-repeat="message in social.messages" class="animate">
+        <div ng-repeat="message in social.messages track by $index" class="animate">
           {{ message }}
         </div>
       </div>
@@ -30,8 +34,6 @@
         placeholder="What are you doing?" />
       </form>
     </div>
-
-    
     <div class="container" ng-controller="HistoryCtrl as history">
       <div class="history">
 
@@ -94,3 +96,5 @@
   <script src="/app/VisibilityService.js" type="text/javascript"></script>
   </body>
 </html>
+
+

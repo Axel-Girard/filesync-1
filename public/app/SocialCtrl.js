@@ -7,13 +7,21 @@ angular
     this.message = '';
 
 	function onViewersUpdated(viewers) {
-      this.viewers = viewers;
-      $scope.$apply();
-    }
+    this.viewers = viewers;
+    $scope.$apply();
+  }
 
-    function sendMessage (message) {
-    	SocketIOService.updateMessage(message);
-    }
+  function onMessagesUpdated(messages) {
+    this.messages = messages;
+    $scope.$apply();
+  }
+
+  this.sendMessage = function() {
+    this.messages.push(this.message);
+   	SocketIOService.messageUpdated(this.message);
+    this.message = '';
+   }
 
     SocketIOService.onViewersUpdated(onViewersUpdated.bind(this));
+    SocketIOService.onMessagesUpdated(onMessagesUpdated.bind(this));
   }]);

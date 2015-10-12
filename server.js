@@ -51,7 +51,23 @@ function Viewers(sio) {
   };
 }
 
+function Messages(sio) {
+  var data = [];
+
+  function notifyChanges() {
+    sio.emit('social:message', data);
+  }
+
+  return {
+    add: function add(message){
+      data.push(message);
+      notifyChanges();
+    }
+  }
+}
+
 var viewers = Viewers(sio);
+var messages = Messages(sio);
 
 
 // @todo extract in its own
@@ -61,13 +77,12 @@ sio.on('connection', function(socket) {
   socket.on('viewer:new', function(nickname) {
     socket.nickname = nickname;
     viewers.add(nickname);
-    console.log('new viewer with nickname %s', nickname, viewers);
+    console.log('new viewer with nickname %s', nickname);
   });
 
-  socket.on('message:new', function(messages) {
-    socket.messages = messages;
-    messages.add(messages);
-    console.log('new messages %s', message, messages);
+  socket.on('message:send', function(message) {
+    messages.add(message);
+    console.log(message);
   });
 
   socket.on('disconnect', function() {
@@ -81,7 +96,6 @@ sio.on('connection', function(socket) {
       // skip this
       return socket.emit('error:auth', 'Unauthorized :)');
     }
-
     // forward the event to everyone
     sio.emit.apply(sio, ['file:changed'].concat(_.toArray(arguments)));
   });
@@ -91,10 +105,6 @@ sio.on('connection', function(socket) {
   socket.on('user-visibility:changed', function(state) {
     socket.visibility = state;
     sio.emit('users:visibility-states', getVisibilityCounts());
-  });
-
-  socket.on('messageSend', function(message) {
-    sio.emit('messageSend', getVisibilityCounts());
   });
 });
 
