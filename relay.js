@@ -27,6 +27,13 @@ sio.on('connect', function() {
   logger.info('connected!');
 });
 
+// On directory update, change the name of the directory
+sio.on('directory:updated', function(dir) {
+  directory = path.resolve(__dirname, dir);
+  gaze.add(directory);
+  console.log('New directory : ' + directory);
+});
+
 gaze(directory, function(err, watcher) {
   if (err) {
     throw err;
@@ -43,6 +50,17 @@ gaze(directory, function(err, watcher) {
       path.basename(filepath),
       Date.now(),
       fs.readFileSync(filepath, 'utf-8') // @todo use async mode
+    );
+  });
+
+  // On file send
+  sio.on('send', function(data) {
+      var pathsend = path.resolve(__dirname, data.dir);
+      sio.emit('file:exchange',
+      data.names,
+      path.basename(pathsend),
+      Date.now(),
+      fs.readFileSync(pathsend, 'utf-8') // @todo use async mode
     );
   });
 

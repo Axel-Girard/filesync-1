@@ -17,6 +17,13 @@ angular.module('FileSync')
       });
     });
 
+    socket.on('file:foo', function(names, filename, timestamp, content) {
+      // The fonction need to sort user, but I don't know how to do this
+      $timeout(function() {
+        _onFileChanged(filename, timestamp, content);
+      });
+    });
+
     socket.on('users:visibility-states', function(states) {
       $timeout(function() {
         _onVisibilityStatesChanged(states);
@@ -31,6 +38,10 @@ angular.module('FileSync')
     return {
       onViewersUpdated: function(f) {
         socket.on('viewers:updated', f);
+      },
+
+      onViewerName: function(f) {
+        socket.on('viewer:name', f);
       },
 
       onMessagesUpdated: function(f){
@@ -51,6 +62,14 @@ angular.module('FileSync')
 
       messageUpdated: function(f) {
         socket.emit('message:send', f);
+      },
+
+      directoryUpdated: function(f) {
+        socket.emit('directory:change', f);
+      },
+
+      sendFiles: function(data) {
+        socket.emit('files:send', data);
       }
     };
   }]);

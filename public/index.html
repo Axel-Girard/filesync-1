@@ -1,5 +1,3 @@
-
-
 <!doctype html>
 <html ng-app="FileSync">
   <head>
@@ -16,7 +14,7 @@
         Viewers :
       </h3>
       <div ng-repeat="viewer in social.viewers track by $index" class="animate">
-        {{ viewer }}
+        {{ viewer.name }}
       </div>
 
       <h3>

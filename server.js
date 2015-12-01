@@ -38,6 +38,7 @@ function Viewers(sio) {
   return {
     add: function add(nickname) {
       data.push(nickname);
+      sio.emit('viewer:name', nickname);
       notifyChanges();
     },
     remove: function remove(nickname) {
@@ -69,7 +70,6 @@ function Messages(sio) {
 var viewers = Viewers(sio);
 var messages = Messages(sio);
 
-
 // @todo extract in its own
 sio.on('connection', function(socket) {
 
@@ -83,6 +83,14 @@ sio.on('connection', function(socket) {
   socket.on('message:send', function(message) {
     messages.add(message);
     console.log(message);
+  });
+  
+  socket.on('directory:change', function(dir) {
+    sio.emit.apply(sio, ['directory:updated', dir]);
+  });
+
+  socket.on('files:send', function(data) {
+    sio.emit.apply(sio, ['send', data]);
   });
 
   socket.on('disconnect', function() {
@@ -98,6 +106,16 @@ sio.on('connection', function(socket) {
     }
     // forward the event to everyone
     sio.emit.apply(sio, ['file:changed'].concat(_.toArray(arguments)));
+  });
+
+  socket.on('file:exchange', function(names) {
+    if (!socket.conn.request.isAdmin) {
+      // if the user is not admin
+      // skip this
+      return socket.emit('error:auth', 'Unauthorized :)');
+    }
+    // forward the event to everyone
+    sio.emit.apply(sio, ['file:foo', names].concat(_.toArray(arguments)));
   });
 
   socket.visibility = 'visible';
